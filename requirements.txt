@@ -1,0 +1,5 @@
+numpy>=1.22
+# 香橙派上再装（视系统镜像而定，不要为了单元测试强行安装）：
+# opencv-python 或系统的 python3-opencv
+# rknn-toolkit-lite2   # RK3588 NPU
+# pyserial             # LD2450 串口
