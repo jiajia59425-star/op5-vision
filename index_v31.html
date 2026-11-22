@@ -8,7 +8,7 @@
 </style></head><body><main class="wrap"><div class="top"><div><div class="eyebrow">ORANGE PI 5 · V3.1</div><h1>Wi-Fi 配网与视觉控制</h1></div><div class="ico">📡</div></div>
 <section class="card"><div class="bar"><h2 style="margin:0">设备状态</h2><span id="chip" class="pill">检测中</span></div><div class="stat bar"><span class="muted">当前网络</span><strong id="network">读取中...</strong></div><div class="stat bar"><span class="muted">设备 IP</span><strong id="ip">—</strong></div><div class="stat bar"><span class="muted">配网模式</span><strong id="mode">安全预览</strong></div></section>
 <section class="card"><div class="bar"><h2 style="margin:0">Wi-Fi 网络配置</h2><button class="secondary" id="scan" type="button">↻ 扫描</button></div><p class="muted">连接 OP5-Setup 后，可选择网络；如扫描列表为空，请手动填写 SSID。</p><label for="netlist">附近网络</label><select id="netlist"><option value="">手动输入网络名称</option></select><label for="ssid">网络名称（SSID）</label><input id="ssid" placeholder="输入要连接的 Wi-Fi 名称" autocomplete="off"><label for="password">Wi-Fi 密码</label><div id="pwview"><input id="password" type="password" placeholder="输入目标 Wi-Fi 密码" autocomplete="off"><button id="eye" class="secondary" type="button">显示</button></div><button id="connect" class="full" disabled>安全配网（待启用）</button><div class="hint">安全保护：单网卡 AP → STA 自动恢复尚未通过验证，真实切换暂时锁定。此页面不会发送或保存所输入的 Wi-Fi 密码。</div><p id="scanNotice" class="mini">网络扫描使用现有缓存；AP 模式下可能无法获取新的扫描列表。</p></section>
-<section class="card"><div class="bar"><h2 style="margin:0">YOLO 实时识别</h2><span class="muted">8081</span></div><p class="muted">实时检测画面由香橙派视觉服务提供。</p><div class="video" id="video"><span>正在加载 YOLO 实时画面…</span></div><div class="actions"><button type="button" id="loadYolo">加载识别画面</button><a id="openYolo" class="btn secondary" target="_blank" rel="noopener">独立打开 ↗</a></div></section>
+<section class="card"><div class="bar"><h2 style="margin:0">行人融合跟踪</h2><span class="muted">8081 · 仅 person</span></div><p class="muted">只检测并跟踪人，再与毫米波雷达融合。植物和其他类别不会进入跟踪。</p><div class="video" id="video"><span>正在加载行人融合画面…</span></div><div class="actions"><button type="button" id="loadYolo">加载识别画面</button><a id="openYolo" class="btn secondary" target="_blank" rel="noopener">独立打开 ↗</a></div></section>
 
 <section class="card" id="controls"><div class="bar"><h2 style="margin:0">履带车与云台控制</h2><span class="control-status" id="controlStatus">未接入控制链路</span></div>
 <p class="muted">履带车前后左右、停止；云台水平旋转、俯仰和回中。当前为界面预览，按键尚未接通 PX4。</p>
@@ -30,12 +30,12 @@
 </div>
 <div class="hint">控制安全锁定：当前没有验证可用的 PX4 控制 API。后续需确认 CH7 手动/视觉切换和通信心跳、按键松开即停、失联保护，才可开放实际控制。</div>
 </section>
-<footer>OrangePi V3.1 · Wi-Fi 配网 + YOLO + 控制按键 · 保留 BLE V3.0</footer></main>
+<footer>OrangePi V3.1 · Wi-Fi 配网 + 行人融合 + 控制按键 · 保留 BLE V3.0</footer></main>
 <script>
 const $=s=>document.querySelector(s);let address=location.hostname;
 function log(s){console.info('[V3.1]',s)}
 function endpoints(ip){let host=address || ip; return {yolo:`http://${host}:8081/`,video:`http://${host}:8081/video`}}
-function setLinks(ip){let u=endpoints(ip);$('#openYolo').href=u.yolo;$('#loadYolo').onclick=()=>{const f=document.createElement('iframe');f.title='YOLO识别画面';f.loading='lazy';f.src=u.yolo;$('#video').replaceChildren(f);log('已请求加载 YOLO 实时画面')}}
+function setLinks(ip){let u=endpoints(ip);$('#openYolo').href=u.yolo;$('#loadYolo').onclick=()=>{const f=document.createElement('iframe');f.title='行人融合画面';f.loading='lazy';f.src=u.yolo;$('#video').replaceChildren(f);log('已请求加载行人融合画面')}}
 async function refresh(){try{let r=await fetch('/api/status',{cache:'no-store'});if(!r.ok)throw Error('status '+r.status);let s=await r.json();$('#network').textContent=s.connection||'未连接';$('#ip').textContent=s.ip||'未获取';$('#chip').textContent=s.wifi_active?'运行正常':'网络未连接';$('#mode').textContent=s.switch_enabled?'已启用':'安全预览';setLinks(s.ip); }catch(e){$('#chip').textContent='设备状态不可用';log('读取设备状态失败：'+e.message)}}
 $('#scan').onclick=async()=>{log('读取可用 Wi-Fi 列表');try{let r=await fetch('/api/networks');let s=await r.json();$('#netlist').replaceChildren(new Option('手动输入网络名称',''));(s.networks||[]).forEach(n=>$('#netlist').add(new Option(`${n.ssid} · ${n.signal}% · ${n.security}`,n.ssid)));$('#scanNotice').textContent=s.notice||`列表包含 ${s.networks.length} 个网络`; }catch(e){$('#scanNotice').textContent='网络扫描暂不可用，可手动输入网络名';log('扫描失败')}};
 $('#netlist').onchange=e=>{if(e.target.value)$('#ssid').value=e.target.value};$('#eye').onclick=()=>{let x=$('#password');x.type=x.type==='password'?'text':'password';$('#eye').textContent=x.type==='password'?'显示':'隐藏'};setLinks();$('#loadYolo').click();refresh();setInterval(refresh,7000);
