@@ -1,0 +1,15 @@
+V3.1.3深度歧义防护（只修改8100 fusion_core.py）
+
+修复内容：当同一视觉方位存在两个角度误差接近、距离相差>=0.5米的雷达点簇时，拒绝将其中任意一个判定为稳定候选（ASSOCIATION_COMPETING_DEPTHS）；禁止未经独立验证就根据较近距离/角度优先选择人物。保留其他门限，8101/8093不变。
+
+应用：unzip -o /srv/samba/op5share/orangepi5share1/OP5_V3_1_3_DEPTH_AMBIGUITY_GUARD.zip -d /home/orangepi/
+ sudo python3 /home/orangepi/OP5_V3_1_3_DEPTH_AMBIGUITY_GUARD/install.py --check
+ sudo python3 /home/orangepi/OP5_V3_1_3_DEPTH_AMBIGUITY_GUARD/install.py --apply
+ sudo systemctl restart op5-v3-fusion-8100
+只读人物在场/离场/返回测试：
+ python3 -u /home/orangepi/OP5_V3_1_3_DEPTH_AMBIGUITY_GUARD/现场出入验证.py
+回退：
+ sudo python3 /home/orangepi/OP5_V3_1_3_DEPTH_AMBIGUITY_GUARD/install.py --rollback
+ sudo systemctl restart op5-v3-fusion-8100
+
+重要：补丁本身仅消除错误放行风险，不承诺自动Ready=True。必须先证明近距离候选对应人物，再调整零位（如有必要）；不能关闭安全判断直接跟踪。

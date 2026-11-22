@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.env
+.env.*
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Secrets / credentials (8101 install.py writes credentials.json on device)
+credentials.json
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.pub
+*.crt
+secrets/
+.secret*
+
+# Runtime / device-only state
+config.json
+*.jsonl
+V31_CAPTURE_*.jsonl
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*~
+*.swp
+.idea/
+.vscode/

@@ -1,0 +1,11 @@
+{
+  "release": "OP5_8090_FUSION_TOGGLE_FINAL_V1",
+  "files": {
+    "install.py": "0fae261a1c9d1605759360696c9cb4735781b9ad6e723906aff91bb126e89900",
+    "runtime_inject.py": "4f1f7a3fc8b911d65d5c6c73e99d79cb311d03a3fedd23a6d42bcb2657925060",
+    "fusion_toggle.js": "1573164cbfa24b1cd9578b45a005294abd10475586aa5a6fdf9f807cfdfc7bac",
+    "fusion_toggle.css": "d319d8a9878b0be98c809fe0cb3dd0232163e81f4a954eccae9b900a2d95c729",
+    "test_offline.py": "95410a96e334590ebf8d0fd78fecf357190013a3f815f5a94d4d9eff483c8749",
+    "安装与使用说明.txt": "93e2a6b8c2a32d7c2a787cf13bf3f159b2986150ddb5ca2d88d78d1752fd6add"
+  }
+}

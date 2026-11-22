@@ -1,0 +1,56 @@
+OP5 V3 雷达+视觉融合 V1（独立只读影子服务，8100）
+======================================================
+用途：关联现有8081视觉选中目标、8092 COIN-D6扫描、8093云台Yaw角度。
+运行后打开：http://香橙派IP:8100/，可同时查看RGB MJPEG、雷达360度点云、视觉目标ID/框、融合候选距离。
+不改8081、8090、8092、8093源码及服务；不占用雷达串口；不发任何舵机、底盘控制命令。
+8093保留已通过实测的PREDICTIVE_FAST_V2＋DUAL_AXIS_GT80C_10S_TEST版本。
+
+=== 第一步：把ZIP放入Windows共享目录 ===
+\192.168.1.251\op5share\orangepi5share1\
+
+=== 第二步：解压和只读检查 ===
+unzip -o /srv/samba/op5share/orangepi5share1/OP5_V3_RADAR_VISION_FUSION_V1.zip -d /home/orangepi/
+python3 /home/orangepi/OP5_V3_RADAR_VISION_FUSION_V1/install.py --check
+检查会验证当前8093/温度模块SHA256及8081 /state、8092 /api/scan、8093 /api/status结构。
+如果检查失败，停止操作并提供输出，不要绕过校验。
+
+=== 第三步：检查通过才安装（不会启动服务） ===
+sudo python3 /home/orangepi/OP5_V3_RADAR_VISION_FUSION_V1/install.py --apply
+
+=== 第四步：启动独立8100服务 ===
+sudo systemctl daemon-reload
+sudo systemctl enable --now op5-v3-fusion-8100
+systemctl is-active op5-v3-fusion-8100
+curl -sS http://127.0.0.1:8100/api/health | python3 -m json.tool
+python3 /home/orangepi/op5_v3_fusion/diagnose.py
+打开 http://192.168.1.251:8100/ （如IP变化请替换）。
+
+=== 关键：标定（未标定之前不推断目标距离） ===
+需确认：1.雷达安装在车身固定(chassis)，还是随着云台转(gimbal)；
+2.RGB摄像头水平视场角HFOV（请查对应镜头规格或实测）；
+3.云台0°且目标居中时，雷达对应的真实方位角radar_zero_deg；
+4.角度方向符号sign为+1还是-1，需转向对照。
+
+配置写入示例（数值只作命令格式演示，不可当作设备标定值）：
+python3 /home/orangepi/op5_v3_fusion/calibrate.py --mount chassis --hfov 70 --zero 0 --sign 1
+python3 /home/orangepi/op5_v3_fusion/calibrate.py --show
+当参数从现场确认后填入并实测校验，8100会自动读取配置。
+注意：雷达点不识别人！仅凭角度范围与距离点簇，不能证明对应目标ID；
+网页所有测距均叫“候选距离”，不能用于自主移动或高速闭环控制。
+
+融合强制条件：YOLO的live+found+selected/box新鲜；雷达online且包序号更新；
+8093云台角度实时；三路接收时间相差不超过0.55秒；雷达连续扫描；
+异常或角度高转速时不输出有效候选；独立包次≥3才给稳定候选。
+8092 /api/scan 的bin缓存点可保留到1.2秒：三传感器的精确物理时间戳没有开放，
+这里的时间同步仅是“读取时间近似”，非硬同步，不能据此开发自动避障或直接电机控制。
+
+=== 一键停止V3、保留全部原服务 ===
+sudo systemctl stop op5-v3-fusion-8100
+
+=== 撤销V3开机启动和服务单元（保留V3代码及标定文件） ===
+sudo python3 /home/orangepi/OP5_V3_RADAR_VISION_FUSION_V1/install.py --rollback
+不需要重启8093、8092或8090。
+
+=== 研究限制 ===
+此版本是可以运行的“目标方向候选雷达距离关联”影子融合，不是识别出同一个物体的可靠
+跨传感器目标跟踪，更不是正式机器人自动控制。当前V2速度与温度保护策略没有改变。

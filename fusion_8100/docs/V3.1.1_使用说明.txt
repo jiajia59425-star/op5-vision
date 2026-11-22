@@ -1,0 +1,14 @@
+V3.1.1后台融合计算调度修复。仅修改8100服务的service.py；融合核心算法、角度距离阈值、8101/8093以及雷达/视觉数据源均不修改。
+问题：旧版fusion_engine.fuse()在GET /api/fusion请求时才运行，而超过0.8秒的读取间隔会使历史被拒绝；每秒一次preflight容易造成WAITING_STABILITY与RANGE_JUMP_REJECTED交替。
+修复：8100内部每0.20秒独立推进融合计算，GET只读缓存；计算线程超过0.50秒未更新则返回FUSION_BACKGROUND_STALE并移除稳定测距（fail-closed）。
+部署：
+  unzip -o /srv/samba/op5share/orangepi5share1/OP5_V3_1_1_ENGINE_TICK_FIX.zip -d /home/orangepi/
+  sudo python3 /home/orangepi/OP5_V3_1_1_ENGINE_TICK_FIX/install.py --check
+  sudo python3 /home/orangepi/OP5_V3_1_1_ENGINE_TICK_FIX/install.py --apply
+  sudo systemctl restart op5-v3-fusion-8100
+  curl -sS http://127.0.0.1:8100/api/health | python3 -m json.tool
+  curl -sS http://127.0.0.1:8101/api/preflight | python3 -m json.tool
+回退：
+  sudo python3 /home/orangepi/OP5_V3_1_1_ENGINE_TICK_FIX/install.py --rollback
+  sudo systemctl restart op5-v3-fusion-8100
+注意：需要人物稳定静止、8090中已选择人物、8092在线；READY可能因实际角度偏差/距离不稳定而仍为false。安装与回退前要求8093跟踪已停止，8101未授权跟踪。

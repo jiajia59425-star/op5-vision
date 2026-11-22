@@ -1,0 +1,7 @@
+{
+  "version": "OP5_V3_1_2_SOURCE_TIMING_FIX",
+  "old_service_sha256": "56b482ad8d8e03f1f31875bf3c875ee55e73dcead1c993f81b70f21fd952a1b6",
+  "new_service_sha256": "1cc5921a975c22a2c9e98733b374a06f9582ce448a507aaa3dc0e108bb89e0cb",
+  "fusion_core_sha256": "6d1cfcc68596e5e44e0b43da7cf8e2be28176092a4719b956ec8fc0b9a8cd1b5",
+  "changes": "8100 only; source polls 140/160/150ms; tick 100ms; source-age diagnostics; same safety gates"
+}

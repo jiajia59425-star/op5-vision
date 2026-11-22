@@ -1,0 +1,14 @@
+V3角度零位影子对照试验 V1
+
+目的：对比当前雷达零位和 +6.2° 修正，在四个视觉位置是否都能稳定地将人物回波与背景区分。
+设计：直接读取8081、8092、8093、8101 GET；使用现场安装的 fusion_core.FusionEngine 与 gate.decide 在内存中并行判断两组标定。
+不会改动8100 config.json，也不会重启任何systemd服务、启动云台或向8093发送任何POST请求。
+
+安装（从Windows共享目录将ZIP拷到香橙派）：
+  unzip -o /srv/samba/op5share/orangepi5share1/OP5_V3_SHADOW_ZERO_CAL_V1.zip -d /home/orangepi/
+  python3 -u /home/orangepi/OP5_V3_SHADOW_ZERO_CAL_V1/shadow_zero_test.py
+
+准备：8090已选中测试人物、8092雷达在线、8093自动跟踪与回中关闭，人员与无载荷云台保持静止。按提示移动人物而不是云台。用Ctrl+C中止即可。
+
+数据解释：'模拟许可'是读取同一时刻的原始点云，以本地融合算法重算后调用8101的门控判定代码得出的理论可用次数。不是现场8101真实许可，也不能代替人工安全确认。
+当多深度歧义或角度错误时算法仍拒绝。对比需综合四个位置，不能仅凭正中间表现决定永久标定。

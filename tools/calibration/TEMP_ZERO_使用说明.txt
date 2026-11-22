@@ -1,0 +1,20 @@
+V3阶段 357.7°临时标定实机回归 / V1
+仅修改8100 config.json中的radar_zero_deg用于测试。没有任何硬件运动接口调用。
+严禁在授权跟踪、云台回中、底盘移动时测试。操作人员应在现场确认无载荷和可断电。
+
+步骤：
+1. 将本ZIP复制到 /srv/samba/op5share/orangepi5share1/，解压：
+   unzip -o /srv/samba/op5share/orangepi5share1/OP5_V3_TEMP_ZERO_REAL_V1.zip -d /home/orangepi/
+2. 检查（无写入）：
+   sudo python3 -u /home/orangepi/OP5_V3_TEMP_ZERO_REAL_V1/temporary_calibrate.py --check
+3. CHECK PASS后才运行：
+   sudo python3 -u /home/orangepi/OP5_V3_TEMP_ZERO_REAL_V1/temporary_calibrate.py --run
+   根据提示依次四个位置按回车；每个位置20次采样。
+   期间只有GET访问8081、8092、8093、8100、8101；无POST，无直接舵机写入。
+4. 程序正常/异常/CTRL+C退出会尝试在finally恢复config.json原始字节。
+   测试前以systemd-run创建独立10分钟恢复定时器；即使SSH突然中断亦可尝试恢复。
+5. 只有看到 ROLLBACK VERIFIED 才代表配置文件和8100运行中的零位双重确认已恢复。
+   如果没有，立刻禁用云台跟踪，检查 config.json 并按输出的备份路径恢复。
+
+注意：定时回退不会证明数据本身准确；不要在测试期间启动8101融合云台。
+该包不修改8093高速预测V2、不修改8101门限、不修改雷达串口。

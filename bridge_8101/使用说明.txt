@@ -1,0 +1,48 @@
+OP5 V3 阶段1：雷达-视觉融合监护摄像云台控制 (8101)
+===========================================================
+作用：既有8093 V2继续负责所有实际舵机位置/速度控制，8100 V3.1判断雷达距离关联。
+V3 8101仅以人工授权的8093原生接口，发自动跟踪START、PULSE、STOP命令。
+不是雷达角度直接控制云台、不是可靠的目标身份关联、不是武器瞄准或底盘自动驾驶。
+
+重要依赖：
+8093 SHA=69e8823e... (PREDICTIVE_FAST_V2+双轴80℃/10秒，维持原样)
+8100 必须先装 OP5_V3_1_DYNAMIC_ASSOC_V1 且 /api/health 返回 V3_1_DYNAMIC_ASSOC_V1。
+雷达固定底盘 chassis，标定保留，不使用未经确认的雷达回波独立发新角度目标。
+
+安装步骤：
+1) 将压缩包拷到Windows共享目录：
+   unzip -o /srv/samba/op5share/orangepi5share1/OP5_V3_FUSION_GIMBAL_STAGE1.zip -d /home/orangepi/
+2) sudo python3 /home/orangepi/OP5_V3_FUSION_GIMBAL_STAGE1/install.py --check
+   应显示 CHECK PASS。若因V3.1尚未安装而拒绝，先安装和验证V3.1动态关联包，勿跳过。
+3) 在云台静止且人工看护、硬件急停可用前提下：
+   sudo python3 /home/orangepi/OP5_V3_FUSION_GIMBAL_STAGE1/install.py --apply
+   保存终端输出的一次性PIN；不提供默认密码。
+4) sudo systemctl daemon-reload
+   sudo systemctl enable --now op5-v3-fusion-gimbal-8101
+   systemctl is-active op5-v3-fusion-gimbal-8101
+   curl -sS http://127.0.0.1:8101/api/health | python3 -m json.tool
+   curl -sS http://127.0.0.1:8101/api/preflight | python3 -m json.tool
+5) Windows PowerShell 建立SSH隧道（保留该窗口打开）：
+   ssh -L 8101:127.0.0.1:8101 root@192.168.1.251
+   在Windows浏览器访问 http://127.0.0.1:8101/
+   填入PIN，滑动并点击人工启动；有不安全情况立刻按页面STOP或硬件断电。
+
+控制要求：
+- 必须有原V3.1稳定候选、3个独立雷达扫描确认、关联角差≤4°、数据龄≤350ms、
+  候选距离0.75~6m、相同YOLO目标ID、人工PIN、窗口持续心跳。
+- 8093强制safe模式启动；保持其原有串口锁、编码器、角度、电压/温度保护。
+- 8100/8081/8093连接异常、ID变化、雷达数据变旧/多簇不确定、网页失联>3秒：
+  撤销后续指令并尝试向8093发送STOP。不会自动重新启动。
+- 网络STOP不是机械急停；已发目标位置可能继续移动少量。
+- 8101进程崩溃时8093的6秒原生租约保护仍会生效，不能替代硬件断电。
+- 初次测试无机械负载且只追踪安全的演示物体；严禁配接危险载荷。
+
+本版本不会改动8093源码、8090、8081、8092、8100源码与雷达串口所有者。
+8101只监听本机127.0.0.1，外部通过SSH转发访问，不直接暴露给局域网。
+
+卸载（先停止跟踪）：
+   sudo python3 /home/orangepi/OP5_V3_FUSION_GIMBAL_STAGE1/install.py --rollback
+   若8093仍在运动会拒绝完成回退，必须现场处置。
+
+验收条件：人工未授权时不动作；待条件满足才可人工启动；监护模式中radar/vision丢失时必须立即请求STOP；
+浏览器关闭时STOP；8079/8093已有独立控制任务时拒绝抢占；不出现新的硬件串口进程。

@@ -1,0 +1,7 @@
+{
+  "camera_hfov_deg": null,
+  "radar_zero_deg": null,
+  "radar_mount": null,
+  "yaw_to_radar_sign": 1,
+  "camera_yaw_offset_deg": 0.0
+}

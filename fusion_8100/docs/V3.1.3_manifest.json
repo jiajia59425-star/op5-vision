@@ -1,0 +1,7 @@
+{
+  "version": "OP5_V3_1_3_DEPTH_AMBIGUITY_GUARD",
+  "old_core_sha256": "6d1cfcc68596e5e44e0b43da7cf8e2be28176092a4719b956ec8fc0b9a8cd1b5",
+  "new_core_sha256": "db62197f62023bcdec336e39ca0df4e4fe1bb67a7030d4ce02f1369b38026ada",
+  "required_service_sha256": "1cc5921a975c22a2c9e98733b374a06f9582ce448a507aaa3dc0e108bb89e0cb",
+  "changes": "8100 core only: fail closed on competing plausible foreground/background depth clusters; read-only A/B presence/absence audit; 8101 unchanged"
+}

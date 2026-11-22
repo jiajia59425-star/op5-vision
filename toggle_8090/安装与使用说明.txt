@@ -1,0 +1,43 @@
+OP5 8090最终版触摸HUD：视觉 / V3雷达融合跟踪一键切换
+版本: OP5_8090_FUSION_TOGGLE_FINAL_V1
+
+需求落实：
+- 原8090跟踪滑块、云台居中滑块和停止按钮不变，在其下方增加“是否加入雷达融合”开关。
+- 关闭：原8093高速预测V2视觉跟踪，保留RGB/热成像等原功能。
+- 开启：使用相同的跟踪滑块，向8101融合监护桥发送人工授权启动；8101再启动8093现有V2预测。雷达用于关联判断、放行及异常停跟，不直接给舵机算角度。
+- 点击停止：停止当前模式并向8093直接发送停止；不允许运动中切换模式。
+- 首次开启融合跟踪，8090主页面弹出触摸字母+数字PIN键盘（8101既有授权机制），不必打开独立8101网页。
+- 开机：8090/8101服务自启，云台跟踪不会自行启动；融合开关每次打开网页默认关闭。
+- 保持8101现有安全门限，不修改8093速度、PID、温度、8100融合参数或351.5°零位。
+
+IMPORTANT：已实测纸箱遮挡人物时旧V3融合门控出现5/20错误许可。此次升级只整合操作界面，不修复该底层误关联。只在人工看护的无载荷摄像云台上测试；它不具备无人值守安全保证。
+
+文件位置：
+  /home/orangepi/dual_overlay_switch.py (8090现有程序，只进行代码增强)
+  /home/orangepi/OP5_8090_FUSION_TOGGLE_FINAL_V1/ (本安装包)
+
+步骤1. 解压至/home/orangepi
+  unzip -o /srv/samba/op5share/orangepi5share1/OP5_8090_FUSION_TOGGLE_FINAL_V1.zip -d /home/orangepi/
+
+步骤2. 确认8093未自动跟踪/回中，8101未armed。预检不会修改任何服务
+  sudo python3 /home/orangepi/OP5_8090_FUSION_TOGGLE_FINAL_V1/install.py --check
+  需要结果为 CHECK PASS: READY_TO_APPLY
+
+步骤3. 安装并使8090、8101开机自启
+  sudo python3 /home/orangepi/OP5_8090_FUSION_TOGGLE_FINAL_V1/install.py --apply
+
+步骤4. 打开香橙派触摸屏已使用的8090地址
+  http://127.0.0.1:8090/
+  如有旧网页缓存，按Ctrl+Shift+R刷新（触摸屏可从Chromium菜单重新加载）。
+  点击目标；选择“是否加入雷达融合”开/关；向右滑动现有跟踪滑块，点击原停止跟踪按钮停止。
+
+重要约束：
+- 8090版本必须具有 OP5_HUD_V11_REAL_INTEGRATION_JS、OP5_AUTO_CENTER_V2_8090_ADDITION 和原云台滑块。结构不符合时安装器直接报错，不覆盖。
+- 若曾安装独立V3触摸面板测试版(OP5_V3_TOUCH_8090_V1)，本包拒绝重复绑定；须先通过旧包回退。
+- 8101源代码与既有授权接口保持不变。不要发送PIN给别人。
+- 已知351.5°旧标定在部分位置不ready；357.7°虽通过回归，但本升级包不擅自永久改变配置。
+
+回退：仅在云台停止且8101未armed后运行
+  sudo python3 /home/orangepi/OP5_8090_FUSION_TOGGLE_FINAL_V1/install.py --rollback
+  回退将恢复8090源码的原始字节，并按安装前记录恢复8101开机自启状态。
+  如果8090安装后又被其他程序修改，回退会拒绝覆盖以保护新增内容。

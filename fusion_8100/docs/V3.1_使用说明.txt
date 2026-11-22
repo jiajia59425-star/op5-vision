@@ -1,0 +1,55 @@
+OP5 V3.1 · COIN-D6＋YOLO动态关联严格只读升级版
+================================================
+用途：优化8100雷达/视觉关联；保留已实测满意的8093高速预测V2、8081、8090及8092全部运行方式。
+
+现场基线：
+  8093: PREDICTIVE_FAST_V2 + DUAL_AXIS_GT80C_10S_TEST
+  8100: V3_FUSION_V1 read-only
+  雷达固定在履带车底盘（chassis）
+  用户先前写入的 camera_hfov_deg、radar_zero_deg、yaw_to_radar_sign 保留原样。
+
+注意：雷达返回的是候选点簇，绝不声称已确认人物身份。V3.1始终只读，不向履带车或云台发送控制指令。当前8093双轴温度80℃/10秒是较低安全裕度的临时策略，本包不修改它。
+
+1. 将OP5_V3_1_DYNAMIC_ASSOC_V1.zip拷到Windows已配置的共享目录，SSH执行：
+   unzip -o /srv/samba/op5share/orangepi5share1/OP5_V3_1_DYNAMIC_ASSOC_V1.zip -d /home/orangepi/
+
+2. 严格只读版本检查：
+   sudo python3 /home/orangepi/OP5_V3_1_DYNAMIC_ASSOC_V1/install.py --check
+   必须显示 READY_TO_APPLY 和 CHECK PASS。若源文件哈希不同，绝不能强行覆盖！
+
+3. 检查通过后安装：
+   sudo python3 /home/orangepi/OP5_V3_1_DYNAMIC_ASSOC_V1/install.py --apply
+   会自动备份原 fusion_core.py、service.py、dashboard.html，不修改 config.json。
+   完成后服务仍运行旧代码，直到你手动重启8100：
+   sudo systemctl restart op5-v3-fusion-8100
+
+4. 只读验证：
+   systemctl is-active op5-v3-fusion-8100
+   curl -sS http://127.0.0.1:8100/api/health | python3 -m json.tool
+   curl -sS http://127.0.0.1:8100/api/fusion | python3 -m json.tool
+   网页 http://192.168.1.251:8100/
+   健康接口version应是 V3_1_DYNAMIC_ASSOC_V1；mode READ_ONLY_SHADOW。
+   初始无目标时 status=VISION_NOT_READY 是正常情况。
+
+5. 人在现场做20秒慢速左右移动，先检查角度/候选距离是否稳定。
+   严格不接入自动控制。相机/雷达近距离视差和安装角度尚需进一步校准。
+
+6. 一键回退原8100版本（会保留标定 config.json）：
+   sudo python3 /home/orangepi/OP5_V3_1_DYNAMIC_ASSOC_V1/install.py --rollback
+   sudo systemctl restart op5-v3-fusion-8100
+
+7. 可选：记录实际雷达原始扫描用于离线双版本对照。打开目标选择后：
+   cd /home/orangepi/OP5_V3_1_DYNAMIC_ASSOC_V1
+   python3 record_raw.py --seconds 20
+   python3 compare_recording.py ./V31_CAPTURE_实际日期时间.jsonl
+   注意采集文件含摄像头的目标检测元数据及周围雷达点云，不包含视频帧。
+
+状态说明：
+  CANDIDATE_STABLE_UNVERIFIED：多次独立扫描、角度/距离连续，仅表示稳定候选，不证明身份。
+  ASSOCIATION_ANGULAR_UNCERTAIN：视觉预测和候选回波角差较大，隐藏距离。
+  ASSOCIATION_AMBIGUOUS：多簇分数接近，且距离不一致，隐藏距离。
+  ASSOCIATION_RANGE_JUMP_REJECTED：疑似切换到其他障碍物，隐藏距离。
+  WAIT_FOR_NEW_RADAR_PACKET：视觉变了但雷达点云未更新，等待新扫描。
+  RADAR_NOT_ONLINE / SENSOR_DATA_STALE：只读设备数据不可用或过期。
+
+所有“关联分数”仅为规则评分，不能解释为身份正确概率。不能拿此数据直接执行避障、速度闭环或者高速自动追人。

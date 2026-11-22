@@ -1,0 +1,21 @@
+V3.1.2 动态融合采集时序改进（8100服务）
+
+针对现场30次许可检查：9次数据过期 + 13次雷达视觉角度不一致。
+本补丁只处理第1类：
+  8100视觉读取180ms改140ms，雷达读取250ms改160ms，云台角度读取350ms改150ms；
+  融合tick从200ms改100ms；同时只读提供sources.*.age_ms、fusion_tick_age_ms。
+  不更改8101 350ms时效门限和4度角度阈值，不更改8100几何校准与关联判定。
+安全：只更新8100 service.py，安装前检查8101未armed且8093跟踪inactive。
+如已有其他修改，校验失败后不要强制安装。
+
+unzip -o /srv/samba/op5share/orangepi5share1/OP5_V3_1_2_SOURCE_TIMING_FIX.zip -d /home/orangepi/
+sudo python3 /home/orangepi/OP5_V3_1_2_SOURCE_TIMING_FIX/install.py --check
+sudo python3 /home/orangepi/OP5_V3_1_2_SOURCE_TIMING_FIX/install.py --apply
+sudo systemctl restart op5-v3-fusion-8100
+python3 /home/orangepi/OP5_V3_1_2_SOURCE_TIMING_FIX/静态标定诊断.py
+
+rollback:
+sudo python3 /home/orangepi/OP5_V3_1_2_SOURCE_TIMING_FIX/install.py --rollback
+sudo systemctl restart op5-v3-fusion-8100
+
+真实设备尚未测试。若设备CPU压力上升、8093响应变慢或跟踪出现异常，请回退。

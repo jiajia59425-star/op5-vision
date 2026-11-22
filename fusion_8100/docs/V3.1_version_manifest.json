@@ -1,0 +1,13 @@
+{
+  "version": "OP5_V3_1_DYNAMIC_ASSOC_V1",
+  "old": {
+    "fusion_core.py": "d42ac9743f8959142fa29d6d31c2903f0a67c24cafe6918dbb247877adfa1183",
+    "service.py": "f1ecf3b4b092107b63a734837051edcfcc5c01e2d1d0789a9fd220474e0c2d02",
+    "dashboard.html": "87342ad7a44463c5353482aff47e5a0a92a99f67b6fd1866355c73c86891f8eb"
+  },
+  "new": {
+    "fusion_core.py": "6d1cfcc68596e5e44e0b43da7cf8e2be28176092a4719b956ec8fc0b9a8cd1b5",
+    "service.py": "aa13b140b19bf182badee8a3dbc5bd3bb1c0492749c17c00c1f6871ab4e02b64",
+    "dashboard.html": "4c67ca503e1cafd9ffdabf76eed495a2641f49910ba05fc6d8dce553df9bc41a"
+  }
+}
