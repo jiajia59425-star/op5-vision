@@ -1,0 +1,241 @@
+
+======== V3 original unit tests (history/v3, matching V3 fusion_core) ========
+CMD: python3 -m unittest discover -s /workspace/op5-vision/fusion_8100/history/v3 -p test_*.py -v
+test_angle_negative (test_v3.CoreTests.test_angle_negative) ... ok
+test_angle_wrap (test_v3.CoreTests.test_angle_wrap) ... ok
+test_bad_box (test_v3.CoreTests.test_bad_box) ... ok
+test_calibration_required (test_v3.CoreTests.test_calibration_required) ... ok
+test_calibration_unset_distance_none (test_v3.CoreTests.test_calibration_unset_distance_none) ... ok
+test_camera_offset (test_v3.CoreTests.test_camera_offset) ... ok
+test_fov_invalid (test_v3.CoreTests.test_fov_invalid) ... ok
+test_fusion_cluster (test_v3.CoreTests.test_fusion_cluster) ... ok
+test_gimbal_mount_no_add_yaw (test_v3.CoreTests.test_gimbal_mount_no_add_yaw) ... ok
+test_invalid_strength (test_v3.CoreTests.test_invalid_strength) ... ok
+test_mount_required (test_v3.CoreTests.test_mount_required) ... ok
+test_negative_sign (test_v3.CoreTests.test_negative_sign) ... ok
+test_no_found (test_v3.CoreTests.test_no_found) ... ok
+test_non_selected_track (test_v3.CoreTests.test_non_selected_track) ... ok
+test_offline_resets_history (test_v3.CoreTests.test_offline_resets_history) ... ok
+test_outdated_radar_frame (test_v3.CoreTests.test_outdated_radar_frame) ... ok
+test_pinhole_center (test_v3.CoreTests.test_pinhole_center) ... ok
+test_pinhole_edges (test_v3.CoreTests.test_pinhole_edges) ... ok
+test_radar_bad_values (test_v3.CoreTests.test_radar_bad_values) ... ok
+test_radar_cluster (test_v3.CoreTests.test_radar_cluster) ... ok
+test_radar_jump_resets (test_v3.CoreTests.test_radar_jump_resets) ... ok
+test_radar_no_cluster (test_v3.CoreTests.test_radar_no_cluster) ... ok
+test_radar_offline (test_v3.CoreTests.test_radar_offline) ... ok
+test_radar_offline_points (test_v3.CoreTests.test_radar_offline_points) ... ok
+test_radar_packet_counter_reset (test_v3.CoreTests.test_radar_packet_counter_reset) ... ok
+test_radar_stale (test_v3.CoreTests.test_radar_stale) ... ok
+test_same_packet_no_fake_stability (test_v3.CoreTests.test_same_packet_no_fake_stability) ... ok
+test_servo_stale (test_v3.CoreTests.test_servo_stale) ... ok
+test_target_change_resets_stability (test_v3.CoreTests.test_target_change_resets_stability) ... ok
+test_target_none (test_v3.CoreTests.test_target_none) ... ok
+test_target_stale (test_v3.CoreTests.test_target_stale) ... ok
+test_target_valid (test_v3.CoreTests.test_target_valid) ... ok
+test_three_independent_updates (test_v3.CoreTests.test_three_independent_updates) ... ok
+test_yaw_angle_mapping (test_v3.CoreTests.test_yaw_angle_mapping) ... ok
+test_yaw_fast_pauses (test_v3.CoreTests.test_yaw_fast_pauses) ... ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 0.003s
+
+OK
+EXIT: 0
+RESULT: PASS
+
+======== V3 original tests against LATEST fusion_core (informational) ========
+CMD: env PYTHONPATH=/workspace/op5-vision/fusion_8100 python3 /workspace/op5-vision/fusion_8100/tests/test_v3_original.py -v
+test_angle_negative (__main__.CoreTests.test_angle_negative) ... ok
+test_angle_wrap (__main__.CoreTests.test_angle_wrap) ... ok
+test_bad_box (__main__.CoreTests.test_bad_box) ... ok
+test_calibration_required (__main__.CoreTests.test_calibration_required) ... ok
+test_calibration_unset_distance_none (__main__.CoreTests.test_calibration_unset_distance_none) ... ok
+test_camera_offset (__main__.CoreTests.test_camera_offset) ... ok
+test_fov_invalid (__main__.CoreTests.test_fov_invalid) ... ok
+test_fusion_cluster (__main__.CoreTests.test_fusion_cluster) ... ok
+test_gimbal_mount_no_add_yaw (__main__.CoreTests.test_gimbal_mount_no_add_yaw) ... ok
+test_invalid_strength (__main__.CoreTests.test_invalid_strength) ... ok
+test_mount_required (__main__.CoreTests.test_mount_required) ... ok
+test_negative_sign (__main__.CoreTests.test_negative_sign) ... ok
+test_no_found (__main__.CoreTests.test_no_found) ... ok
+test_non_selected_track (__main__.CoreTests.test_non_selected_track) ... ok
+test_offline_resets_history (__main__.CoreTests.test_offline_resets_history) ... ok
+test_outdated_radar_frame (__main__.CoreTests.test_outdated_radar_frame) ... ok
+test_pinhole_center (__main__.CoreTests.test_pinhole_center) ... ok
+test_pinhole_edges (__main__.CoreTests.test_pinhole_edges) ... ok
+test_radar_bad_values (__main__.CoreTests.test_radar_bad_values) ... ok
+test_radar_cluster (__main__.CoreTests.test_radar_cluster) ... ok
+test_radar_jump_resets (__main__.CoreTests.test_radar_jump_resets) ... ok
+test_radar_no_cluster (__main__.CoreTests.test_radar_no_cluster) ... ok
+test_radar_offline (__main__.CoreTests.test_radar_offline) ... ok
+test_radar_offline_points (__main__.CoreTests.test_radar_offline_points) ... ok
+test_radar_packet_counter_reset (__main__.CoreTests.test_radar_packet_counter_reset) ... ok
+test_radar_stale (__main__.CoreTests.test_radar_stale) ... ok
+test_same_packet_no_fake_stability (__main__.CoreTests.test_same_packet_no_fake_stability) ... ok
+test_servo_stale (__main__.CoreTests.test_servo_stale) ... ok
+test_target_change_resets_stability (__main__.CoreTests.test_target_change_resets_stability) ... ok
+test_target_none (__main__.CoreTests.test_target_none) ... ok
+test_target_stale (__main__.CoreTests.test_target_stale) ... ok
+test_target_valid (__main__.CoreTests.test_target_valid) ... ok
+test_three_independent_updates (__main__.CoreTests.test_three_independent_updates) ... ok
+test_yaw_angle_mapping (__main__.CoreTests.test_yaw_angle_mapping) ... ok
+test_yaw_fast_pauses (__main__.CoreTests.test_yaw_fast_pauses) ... ok
+
+----------------------------------------------------------------------
+Ran 35 tests in 0.002s
+
+OK
+EXIT: 0
+RESULT: PASS
+
+======== V3.1 test_dynamic.py against LATEST fusion_core (V3.1.3) ========
+CMD: env PYTHONPATH=/workspace/op5-vision/fusion_8100 python3 /workspace/op5-vision/fusion_8100/tests/test_dynamic.py -v
+test_348_and_12_competition_at_zero_refused (__main__.DynamicTests.test_348_and_12_competition_at_zero_refused) ... ok
+test_ambiguous_equal_angle_competing_ranges_hides (__main__.DynamicTests.test_ambiguous_equal_angle_competing_ranges_hides) ... FAIL
+test_angle_residual_above_7_refused (__main__.DynamicTests.test_angle_residual_above_7_refused) ... ok
+test_counter_reset_requires_reconfirm (__main__.DynamicTests.test_counter_reset_requires_reconfirm) ... ok
+test_missing_calibration_clears (__main__.DynamicTests.test_missing_calibration_clears) ... ok
+test_new_id_requires_three_again (__main__.DynamicTests.test_new_id_requires_three_again) ... ok
+test_no_motor_or_radar_writes_in_core (__main__.DynamicTests.test_no_motor_or_radar_writes_in_core) ... ok
+test_prior_keeps_person_vs_background (__main__.DynamicTests.test_prior_keeps_person_vs_background) ... FAIL
+test_radar_offline_clears (__main__.DynamicTests.test_radar_offline_clears) ... ok
+test_radar_old_clears (__main__.DynamicTests.test_radar_old_clears) ... ok
+test_radial_velocity_signed (__main__.DynamicTests.test_radial_velocity_signed) ... ok
+test_range_jump_1_to_3_rejected (__main__.DynamicTests.test_range_jump_1_to_3_rejected) ... ok
+test_reacquire_after_target_lost (__main__.DynamicTests.test_reacquire_after_target_lost) ... ok
+test_repeated_packet_not_counted (__main__.DynamicTests.test_repeated_packet_not_counted) ... ok
+test_reuse_vision_box_big_teleport_resets (__main__.DynamicTests.test_reuse_vision_box_big_teleport_resets) ... ok
+test_same_packet_new_direction_waits (__main__.DynamicTests.test_same_packet_new_direction_waits) ... ok
+test_servo_old_clears (__main__.DynamicTests.test_servo_old_clears) ... ok
+test_single_read_identity_not_claimed (__main__.DynamicTests.test_single_read_identity_not_claimed) ... ok
+test_three_new_packets_confirms (__main__.DynamicTests.test_three_new_packets_confirms) ... ok
+test_uncertain_does_not_keep_old_value (__main__.DynamicTests.test_uncertain_does_not_keep_old_value) ... ok
+test_version (__main__.DynamicTests.test_version) ... ok
+test_wrap_across_359_to_0 (__main__.DynamicTests.test_wrap_across_359_to_0) ... ok
+test_yaw_motion_pause (__main__.DynamicTests.test_yaw_motion_pause) ... ok
+test_zero_crossing_series (__main__.DynamicTests.test_zero_crossing_series) ... ok
+
+======================================================================
+FAIL: test_ambiguous_equal_angle_competing_ranges_hides (__main__.DynamicTests.test_ambiguous_equal_angle_competing_ranges_hides)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/op5-vision/fusion_8100/tests/test_dynamic.py", line 54, in test_ambiguous_equal_angle_competing_ranges_hides
+    self.assertEqual(d['status'],'ASSOCIATION_AMBIGUOUS')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'ASSOCIATION_COMPETING_DEPTHS' != 'ASSOCIATION_AMBIGUOUS'
+- ASSOCIATION_COMPETING_DEPTHS
++ ASSOCIATION_AMBIGUOUS
+
+
+======================================================================
+FAIL: test_prior_keeps_person_vs_background (__main__.DynamicTests.test_prior_keeps_person_vs_background)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/op5-vision/fusion_8100/tests/test_dynamic.py", line 76, in test_prior_keeps_person_vs_background
+    self.assertIsNotNone(d['candidate'])
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.004s
+
+FAILED (failures=2)
+EXIT: 1
+RESULT: FAIL (exit 1)
+
+======== V3.1 test_dynamic.py against V3.1 fusion_core (history/v3.1) ========
+CMD: env PYTHONPATH=/workspace/op5-vision/fusion_8100/history/v3.1 python3 /workspace/op5-vision/fusion_8100/tests/test_dynamic.py -v
+test_348_and_12_competition_at_zero_refused (__main__.DynamicTests.test_348_and_12_competition_at_zero_refused) ... ok
+test_ambiguous_equal_angle_competing_ranges_hides (__main__.DynamicTests.test_ambiguous_equal_angle_competing_ranges_hides) ... ok
+test_angle_residual_above_7_refused (__main__.DynamicTests.test_angle_residual_above_7_refused) ... ok
+test_counter_reset_requires_reconfirm (__main__.DynamicTests.test_counter_reset_requires_reconfirm) ... ok
+test_missing_calibration_clears (__main__.DynamicTests.test_missing_calibration_clears) ... ok
+test_new_id_requires_three_again (__main__.DynamicTests.test_new_id_requires_three_again) ... ok
+test_no_motor_or_radar_writes_in_core (__main__.DynamicTests.test_no_motor_or_radar_writes_in_core) ... ok
+test_prior_keeps_person_vs_background (__main__.DynamicTests.test_prior_keeps_person_vs_background) ... ok
+test_radar_offline_clears (__main__.DynamicTests.test_radar_offline_clears) ... ok
+test_radar_old_clears (__main__.DynamicTests.test_radar_old_clears) ... ok
+test_radial_velocity_signed (__main__.DynamicTests.test_radial_velocity_signed) ... ok
+test_range_jump_1_to_3_rejected (__main__.DynamicTests.test_range_jump_1_to_3_rejected) ... ok
+test_reacquire_after_target_lost (__main__.DynamicTests.test_reacquire_after_target_lost) ... ok
+test_repeated_packet_not_counted (__main__.DynamicTests.test_repeated_packet_not_counted) ... ok
+test_reuse_vision_box_big_teleport_resets (__main__.DynamicTests.test_reuse_vision_box_big_teleport_resets) ... ok
+test_same_packet_new_direction_waits (__main__.DynamicTests.test_same_packet_new_direction_waits) ... ok
+test_servo_old_clears (__main__.DynamicTests.test_servo_old_clears) ... ok
+test_single_read_identity_not_claimed (__main__.DynamicTests.test_single_read_identity_not_claimed) ... ok
+test_three_new_packets_confirms (__main__.DynamicTests.test_three_new_packets_confirms) ... ok
+test_uncertain_does_not_keep_old_value (__main__.DynamicTests.test_uncertain_does_not_keep_old_value) ... ok
+test_version (__main__.DynamicTests.test_version) ... ok
+test_wrap_across_359_to_0 (__main__.DynamicTests.test_wrap_across_359_to_0) ... ok
+test_yaw_motion_pause (__main__.DynamicTests.test_yaw_motion_pause) ... ok
+test_zero_crossing_series (__main__.DynamicTests.test_zero_crossing_series) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.005s
+
+OK
+EXIT: 0
+RESULT: PASS
+
+======== V3.1.3 test_v313.py against LATEST fusion_core ========
+CMD: env PYTHONPATH=/workspace/op5-vision/fusion_8100 python3 /workspace/op5-vision/fusion_8100/tests/test_v313.py -v
+test_competing_depth_prevents_false_stable (__main__.Tests.test_competing_depth_prevents_false_stable) ... ok
+test_corrected_bearing_allows_only_near_candidate (__main__.Tests.test_corrected_bearing_allows_only_near_candidate) ... ok
+test_new_target_id_unsupported_no_identity_claim (__main__.Tests.test_new_target_id_unsupported_no_identity_claim) ... ok
+test_ordinary_singular_cluster_still_works (__main__.Tests.test_ordinary_singular_cluster_still_works) ... ok
+test_zero_wrap (__main__.Tests.test_zero_wrap) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+OK
+EXIT: 0
+RESULT: PASS
+
+======== bridge_8101 test_stage1.py ========
+CMD: python3 /workspace/op5-vision/bridge_8101/test_stage1.py -v
+test_no_auto_restart (__main__.BridgeTests.test_no_auto_restart) ... ok
+test_no_motion_when_not_armed (__main__.BridgeTests.test_no_motion_when_not_armed) ... ok
+test_no_pulse_on_radar_invalidation (__main__.BridgeTests.test_no_pulse_on_radar_invalidation) ... V3 fused camera follow OFF: 融合安全门关闭：NO_RADAR
+ok
+test_operator_disconnected (__main__.BridgeTests.test_operator_disconnected) ... V3 fused camera follow OFF: 8101操作页面断开或未持续确认，自动停止
+ok
+test_pulse_when_ready (__main__.BridgeTests.test_pulse_when_ready) ... ok
+test_safe_stop_when_invalid (__main__.BridgeTests.test_safe_stop_when_invalid) ... V3 fused camera follow OFF: 融合安全门关闭：STALE
+ok
+test_start_authorized_v2 (__main__.BridgeTests.test_start_authorized_v2) ... V3 fused camera follow ARM target=(418, 0)
+ok
+test_start_fails_on_other_operator (__main__.BridgeTests.test_start_fails_on_other_operator) ... ok
+test_stop_retry (__main__.BridgeTests.test_stop_retry) ... 8093 STOP failed; retry needed, hardware disconnect if necessary: offline
+ok
+test_angle (__main__.GateTests.test_angle) ... ok
+test_fail_closed_rad_range (__main__.GateTests.test_fail_closed_rad_range) ... ok
+test_fusion_changed_id (__main__.GateTests.test_fusion_changed_id) ... ok
+test_mount (__main__.GateTests.test_mount) ... ok
+test_no_unverified (__main__.GateTests.test_no_unverified) ... ok
+test_offline_source (__main__.GateTests.test_offline_source) ... ok
+test_ready (__main__.GateTests.test_ready) ... ok
+test_stale (__main__.GateTests.test_stale) ... ok
+test_stop_external (__main__.GateTests.test_stop_external) ... ok
+test_target_changed (__main__.GateTests.test_target_changed) ... ok
+test_unconfirmed (__main__.GateTests.test_unconfirmed) ... ok
+test_unsafe_mode (__main__.GateTests.test_unsafe_mode) ... ok
+test_version (__main__.GateTests.test_version) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.003s
+
+OK
+EXIT: 0
+RESULT: PASS
+
+======== toggle_8090 test_offline.py ========
+CMD: python3 /workspace/op5-vision/toggle_8090/test_offline.py
+PASS JS syntax
+Source snapshots unavailable: core syntax checked only
+OFFLINE TEST PASS: no motor or radar commands issued
+EXIT: 0
+RESULT: PASS
+
+======== SUMMARY ========
