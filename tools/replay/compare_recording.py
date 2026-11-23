@@ -7,7 +7,10 @@ from pathlib import Path
 from fusion_core import FusionEngine
 
 ROOT=Path(__file__).resolve().parent
-spec=importlib.util.spec_from_file_location('old_v3',ROOT/'old_fusion_core_reference.py')
+old_file=ROOT/'old_fusion_core_reference.py'
+if not old_file.is_file():
+    old_file=ROOT.parents[1]/'fusion_8100'/'history'/'v3'/'fusion_core.py'
+spec=importlib.util.spec_from_file_location('old_v3',old_file)
 legacy=importlib.util.module_from_spec(spec);spec.loader.exec_module(legacy)
 
 def main():

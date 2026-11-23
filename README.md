@@ -113,15 +113,15 @@ Downloads 里还有 `OP5_V3_1_1_ENGINE_TICK_FIX (1).zip` 和 `OP5_V3_FUSION_GIMB
 | `fusion_8100/history/v3/test_v3.py`（35 项，对 V3 核心） | 通过 |
 | `tests/test_v3_original.py`（35 项，对**最新** V3.1.3 核心） | 通过 |
 | `tests/test_dynamic.py`（24 项，对 V3.1 核心） | 通过 |
-| `tests/test_dynamic.py`（24 项，对**最新** V3.1.3 核心） | **22 通过，2 失败**（见下） |
+| `tests/test_dynamic.py`（24 项，对**最新**核心） | **23 通过，1 失败**（见下） |
 | `tests/test_v313.py`（5 项，对最新核心） | 通过 |
 | `bridge_8101/test_stage1.py`（22 项） | 通过 |
 | `toggle_8090/test_offline.py` | 通过（JS 语法 + 未发出电机/雷达命令）。因缺少 8090 主程序快照，日志提示 `Source snapshots unavailable: core syntax checked only`，未做完整 HUD 注入回放 |
 
-`test_dynamic.py` 在最新核心上失败的 2 项，是 V3.1.3「竞争深度一律拒绝」的预期行为变化，不是合并拷错文件：
+`test_dynamic.py` 在最新核心上仍失败的 1 项，是 V3.1.3「没有航迹时竞争深度一律拒绝」的预期状态名变化，不是合并拷错文件：
 
-1. `test_ambiguous_equal_angle_competing_ranges_hides`：期望状态 `ASSOCIATION_AMBIGUOUS`，实际为更明确的 `ASSOCIATION_COMPETING_DEPTHS`（同样不给出距离）。
-2. `test_prior_keeps_person_vs_background`：V3.1 允许用历史先验在人/背景之间保住人物候选；V3.1.3 在近远点簇同时成立时改为直接拒绝，候选为 `None`。
+1. `test_ambiguous_equal_angle_competing_ranges_hides`：期望状态 `ASSOCIATION_AMBIGUOUS`，实际为更明确的 `ASSOCIATION_COMPETING_DEPTHS`（同样不给出距离）。没有已确认航迹时保持拒绝。
+2. `test_prior_keeps_person_vs_background`：已有连续距离时，背景点簇不再把人物候选清掉，此项在最新核心上通过。没有航迹时的竞争深度拒绝不变。
 
 未运行：各包 `install.py`、`test_install_offline.py`（会导入并执行安装逻辑），以及需要实机 8081/8092/8093 的影子测试、临时标定脚本。
 

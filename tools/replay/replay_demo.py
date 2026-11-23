@@ -10,6 +10,8 @@ from fusion_core import FusionEngine
 
 PKG=Path(__file__).resolve().parent
 oldpath=PKG/'old_fusion_core_reference.py'
+if not oldpath.is_file():
+    oldpath=PKG.parents[1]/'fusion_8100'/'history'/'v3.1'/'old_fusion_core_reference.py'
 spec=importlib.util.spec_from_file_location('legacy_fusion_core',oldpath)
 old=importlib.util.module_from_spec(spec);spec.loader.exec_module(old)
 CONF={'camera_hfov_deg':110,'radar_zero_deg':0,'radar_mount':'chassis','yaw_to_radar_sign':1,'camera_yaw_offset_deg':0}

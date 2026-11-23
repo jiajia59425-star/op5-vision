@@ -1,4 +1,4 @@
-current: OP5_V3_1_3_DEPTH_AMBIGUITY_GUARD + OP5_V3_1_2_SOURCE_TIMING_FIX
+current: OP5_V3_1_3_DEPTH_AMBIGUITY_GUARD + OP5_V3_1_2_SOURCE_TIMING_FIX + person-only / continuity hold
 fusion_core.py: OP5_V3_1_3_DEPTH_AMBIGUITY_GUARD (whole-file replace of V3.1 core)
 service.py:     OP5_V3_1_2_SOURCE_TIMING_FIX (whole-file replace of V3.1.1, which replaced V3.1)
 dashboard.html: OP5_V3_1_DYNAMIC_ASSOC_V1

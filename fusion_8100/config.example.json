@@ -3,5 +3,7 @@
   "radar_zero_deg": null,
   "radar_mount": null,
   "yaw_to_radar_sign": 1,
-  "camera_yaw_offset_deg": 0.0
+  "camera_yaw_offset_deg": 0.0,
+  "person_class_ids": [0],
+  "person_class_names": ["person", "行人"]
 }
