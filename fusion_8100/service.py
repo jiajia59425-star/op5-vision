@@ -105,7 +105,8 @@ def compute_fuse_output():
     result['config']={'camera_hfov_deg':c.get('camera_hfov_deg'),
                       'radar_zero_deg':c.get('radar_zero_deg'),
                       'radar_mount':c.get('radar_mount'),
-                      'yaw_to_radar_sign':c.get('yaw_to_radar_sign')} if 'c' in locals() else {}
+                      'yaw_to_radar_sign':c.get('yaw_to_radar_sign'),
+                      'person_class_ids':c.get('person_class_ids', [0])} if 'c' in locals() else {}
     return result
 
 

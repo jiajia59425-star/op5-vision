@@ -49,6 +49,12 @@ def decide(fusion, vision, auto=None, expected_target=None):
         type(vid) is not int or type(vcls) is not int or
         (fid,fcls) != (vid,vcls)):
         return False, '视觉目标ID/类别与融合结果不一致', None
+    label = target.get('class_name') or vision.get('selected_class_name') or ''
+    if isinstance(label, str) and label.strip() and label.strip().lower() not in ('person', '行人'):
+        return False, '视觉类别不是 person，禁止跟踪', None
+    allowed = cfg.get('person_class_ids') or [0]
+    if not isinstance(allowed, list) or fcls not in allowed or vcls not in allowed:
+        return False, '视觉类别不是 person，禁止跟踪', None
     if vision.get('live') is not True or vision.get('found') is not True:
         return False, '视觉目标不可用', None
     if expected_target is not None and (fid,fcls) != expected_target:

@@ -16,6 +16,29 @@ def angular_delta(a, b):
     return (a-b+180.0) % 360.0-180.0
 
 
+def person_allowed(class_id, class_name, config):
+    """只允许 person。名字非空时以名字为准，避免类别号是 0 但标签是植物。"""
+    if not isinstance(config, dict):
+        config = {}
+    raw_ids = config.get('person_class_ids', [0])
+    raw_names = config.get('person_class_names', ['person'])
+    ids = set()
+    if isinstance(raw_ids, (list, tuple)):
+        for item in raw_ids:
+            if type(item) is int:
+                ids.add(item)
+    if not ids:
+        ids.add(0)
+    names = {'person', '行人'}
+    if isinstance(raw_names, (list, tuple)):
+        for item in raw_names:
+            if isinstance(item, str) and item.strip():
+                names.add(item.strip().lower())
+    if isinstance(class_name, str) and class_name.strip():
+        return class_name.strip().lower() in names
+    return type(class_id) is int and class_id in ids
+
+
 def camera_bearing_deg(cx, width, hfov_deg):
     """Pinhole horizontal ray angle: avoids assuming equidistant projection."""
     if not (finite_number(cx) and finite_number(width) and 0 <= cx <= width and width >= 32):
@@ -48,7 +71,10 @@ def validated_selection(v, now=None):
             return None,'VISION_BOX_INVALID'
         x1,y1,x2,y2=b
         if not (0<=x1<x2<=w and 0<=y1<y2<=h):return None,'VISION_BOX_INVALID'
-        return {'id':ident,'class_id':cls,'box':list(b),'width':w,'height':h,
+        label = t.get('class_name') or t.get('label') or t.get('name') or v.get('selected_class_name') or v.get('class_name') or ''
+        if not isinstance(label, str):
+            label = ''
+        return {'id':ident,'class_id':cls,'class_name':label,'box':list(b),'width':w,'height':h,
                 'cx':(x1+x2)/2,'cy':(y1+y2)/2,'age_ms':round((now-updated)*1000,1)},'OK'
     return None,'SELECTED_BOX_NOT_FOUND'
 
@@ -155,6 +181,10 @@ class FusionEngine:
         rdata,rt=radar
         sdata,st=servo
         target,reason=validated_selection(vdata,now)
+        # 8081 源码不在本仓库。融合入口拒绝非 person，植物和其他类不会被跟踪或融合。
+        if target is not None and not person_allowed(target.get('class_id'), target.get('class_name'), config):
+            target = None
+            reason = 'CLASS_NOT_PERSON'
         pts=radar_points(rdata)
         out['laser_points']=[list(p) for p in pts[:1200]]
         out['radar_online']=bool(isinstance(rdata,dict) and rdata.get('online') is True and pts)
@@ -177,6 +207,8 @@ class FusionEngine:
         if key!=self.last_key:self._reset_track(key)
         if not target:
             out['status']=reason
+            if reason=='CLASS_NOT_PERSON':
+                out['association_warning']='视觉选中的不是 person，不跟踪、不融合'
             self._reset_track(None)
             return out
         if not out['radar_online']:
@@ -214,8 +246,10 @@ class FusionEngine:
             self.last_yaw_sample=(st,yaw)
         out['yaw_rate_deg_s']=round(self.yaw_rate_deg_s,1) if self.yaw_rate_deg_s is not None else None
         if self.yaw_rate_deg_s is not None and abs(self.yaw_rate_deg_s)>35:
+            # 暂停本帧，但不要清掉已经确认的距离。云台跟着人转时经常超过 35°/s，
+            # 每转一次就重计 3 包，稳定距离会一直起不来。
             out['status']='YAW_MOVING_FAST_ASSOCIATION_PAUSED'
-            self._reset_track(key)
+            out['association_warning']='云台转动过快，本帧不更新关联，保留已有航迹'
             return out
         fov_angle=camera_bearing_deg(target['cx'],target['width'],hfov)
         body_yaw=yaw if mount=='chassis' else 0.0
@@ -238,14 +272,16 @@ class FusionEngine:
         candidates=enumerate_clusters(pts,bearing,window)
         out['association_candidates']=len(candidates)
         if not candidates:
+            # 点落在角度窗外时同样不输出距离，但保留已有确认。
+            # 否则一次 10° 左右的零位误差就会把航迹打回零。
             out['status']='NO_RADAR_CLUSTER_IN_TARGET_DIRECTION'
-            self.history=[]
             return out
         good=[c for c in candidates if abs(c['angle_error_deg'])<=self.MAX_ANGLE_ERROR_DEG]
         if not good:
+            # 现场记录里大量帧角差在 7° 门外（例如 359° 对 348°）。
+            # 这些帧仍然不输出距离，但不再把已经积累的确认次数清零。
             out['status']='ASSOCIATION_ANGULAR_UNCERTAIN'
-            out['association_warning']='雷达点簇方向与视觉目标偏差过大，拒绝提供距离'
-            self.history=[]
+            out['association_warning']='雷达点簇方向与视觉目标偏差过大，本帧不更新距离'
             return out
         # Stable previous range gives inertia, particularly when point-cloud
         # clustering temporarily splits a person around radar 0 degrees.
@@ -265,23 +301,54 @@ class FusionEngine:
                                    if prev is not None else 0)
             return angle*1.8+continuity+prior_bearing_penalty+0.3*c['range_spread_m']
         ranked=sorted(good,key=score)
-        # Depth ambiguity safety guard (V3.1.3): two angularly plausible
-        # surfaces at substantially different depths must never be deemed a
-        # verified foreground/background association solely by a score tie
-        # breaker, even after repeated identical radar sweeps. Without
-        # independent occupancy evidence, selecting the nearer OR the farther
-        # object can silently authorize tracking of the wrong physical target.
-        # This deliberately fails closed until geometry is calibrated.
+        # 深度歧义（V3.1.3）：没有航迹时，角度接近但距离差 ≥0.5m 的两簇一律拒绝。
+        # 不能靠“更近”或分数去猜人和背景。
+        # 已经有至少两包连续距离时，只留下和预测距离连续的那一簇；
+        # 另一簇离预测 ≥0.5m 就当成背景，不再把整条航迹清掉。
+        # 两簇都和预测连续、或都对不上时，仍然失败关闭。
+        def _near_prediction(c):
+            if predicted is None or len(self.history) < 2:
+                return False
+            max_step = 0.23 + self.MAX_RADIAL_RATE_M_S * elapsed
+            return abs(c['range_m'] - predicted) <= max_step
+
+        competing = []
         for i, c1 in enumerate(good):
             for c2 in good[i+1:]:
                 if (abs(c1['range_m']-c2['range_m']) >= 0.50 and
                     abs(abs(c1['angle_error_deg'])-abs(c2['angle_error_deg'])) <= 2.0):
-                    out['status']='ASSOCIATION_COMPETING_DEPTHS'
-                    out['association_warning']='目标方向存在角度接近但距离不同的点簇，未证实身份，禁止融合控制'
-                    out['association_quality']='NONE'
-                    self.history=[]
-                    self.last_packet=None
-                    return out
+                    competing.append((c1, c2))
+        if competing:
+            resolved = None
+            blocked = predicted is None or len(self.history) < 2
+            if not blocked:
+                for c1, c2 in competing:
+                    keep1 = _near_prediction(c1) and abs(c2['range_m']-predicted) >= 0.50
+                    keep2 = _near_prediction(c2) and abs(c1['range_m']-predicted) >= 0.50
+                    pick = c1 if keep1 and not keep2 else c2 if keep2 and not keep1 else None
+                    if pick is None:
+                        blocked = True
+                        break
+                    if resolved is not None and abs(resolved['range_m']-pick['range_m']) > 0.22:
+                        blocked = True
+                        break
+                    resolved = pick
+            if blocked or resolved is None:
+                out['status']='ASSOCIATION_COMPETING_DEPTHS'
+                out['association_warning']='目标方向存在角度接近但距离不同的点簇，未证实身份，禁止融合控制'
+                out['association_quality']='NONE'
+                self.history=[]
+                self.last_packet=None
+                return out
+            good = [c for c in good if _near_prediction(c)]
+            ranked = sorted(good, key=score)
+            out['association_warning']='同方位另有距离不一致的点簇，已按已确认距离连续性忽略'
+        if not ranked:
+            out['status']='ASSOCIATION_COMPETING_DEPTHS'
+            out['association_quality']='NONE'
+            self.history=[]
+            self.last_packet=None
+            return out
         chosen=ranked[0]
         out['angular_residual_deg']=round(abs(chosen['angle_error_deg']),2)
         if len(ranked)>=2 and abs(score(ranked[1])-score(chosen))<0.40 and abs(ranked[1]['range_m']-chosen['range_m'])>0.22:
@@ -291,7 +358,13 @@ class FusionEngine:
             return out
         if prev:
             max_step=0.23+self.MAX_RADIAL_RATE_M_S*elapsed
-            if (now-prev[0]>0.8 or abs(chosen['range_m']-predicted)>max_step):
+            range_gap=abs(chosen['range_m']-predicted)
+            quiet_s=now-prev[0]
+            # 角差把门控在门外的那几帧不会写入 history。
+            # 只要新距离仍连续，不能仅因为中间空了 0.8 秒就当成距离跳变。
+            # 空档超过 1.5 秒，或空档超过 0.8 秒且距离也变了，才重新确认。
+            if (range_gap>max_step or quiet_s>1.5 or
+                    (quiet_s>0.8 and range_gap>0.40)):
                 out['status']='ASSOCIATION_RANGE_JUMP_REJECTED'
                 out['association_warning']='候选距离变化超过连续性阈值，重新确认'
                 self.history=[]

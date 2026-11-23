@@ -64,6 +64,15 @@ class GateTests(unittest.TestCase):
     def test_mount(self):
         f,v,a=sample_data();f['config']['radar_mount']='gimbal'
         self.assertFalse(decide(f,v,a,(418,0))[0])
+    def test_plant_class_refused(self):
+        f,v,a=sample_data()
+        f['target']['class_id']=58
+        v['selected_class']=58
+        f['target']['class_name']='potted plant'
+        self.assertFalse(decide(f,v,a,(418,58))[0])
+        f,v,a=sample_data()
+        f['target']['class_name']='potted plant'
+        self.assertFalse(decide(f,v,a,(418,0))[0])
 
 class BridgeTests(unittest.TestCase):
     def setUp(self):
